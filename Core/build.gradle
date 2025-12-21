@@ -50,7 +50,12 @@ artifacts {
 
 task copyToMainOut(type: Copy) {
     dependsOn(tasks.build)
-    delete file("../build-output-final/").listFiles()
+    doFirst {
+        def outputDir = file("../build-output-final/")
+        if (outputDir.exists()) {
+            delete outputDir.listFiles()
+        }
+    }
     from file("build/libs/Core-${project.version}-all.jar")
     into file("../build-output-final")
     rename 'Core-', 'JakesRTP-v'
@@ -59,7 +64,9 @@ task copyToMainOut(type: Copy) {
 
 task prepareTestServer(type: Copy) {
     dependsOn(tasks.copyToMainOut)
-    delete file("../testServer/plugins/JakesRTP.jar")
+    doFirst {
+        delete file("../testServer/plugins/JakesRTP.jar")
+    }
     from file("../build-output-final/JakesRTP-v${project.version}.jar")
     into file("../testServer/plugins/")
     rename '-.*\\.', '\\.'
