@@ -5,9 +5,15 @@ plugins {
 
 repositories {
     mavenCentral()
-    maven { url 'https://papermc.io/repo/repository/maven-public/' }
+    maven {
+        url 'https://jitpack.io'
+        content { includeGroupByRegex 'com\\.github\\..*' }
+    }
+    maven {
+        url 'https://papermc.io/repo/repository/maven-public/'
+        content { excludeGroupByRegex 'com\\.github\\..*' }
+    }
     maven { url 'https://repo.codemc.io/repository/maven-public/' }
-    maven { url 'https://jitpack.io' }
     maven { url 'https://maven.enginehub.org/repo/' }
     maven { url 'https://repo.mikeprimm.com/'}
 }
