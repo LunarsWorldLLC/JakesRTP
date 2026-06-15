@@ -85,7 +85,7 @@ public class CmdRtp implements TabExecutor {
                 else if (!warmup) teleport();
                     // If we want the user to stand still AND they move, we cancel this runnable / future rtp.
                 else if (rtpProfile.warmupCancelOnMove &&
-                         (startLoc.getWorld() != player.getWorld() || startLoc.distance(player.getLocation()) > 1))
+                         (startLoc.getWorld() != player.getWorld() || startLoc.distanceSquared(player.getLocation()) > 1))
                     cancel();
                     // If we have waited enough time, we teleport the user.
                 else if (timeDifInSeconds() >= rtpProfile.warmup) teleport();

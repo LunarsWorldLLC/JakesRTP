@@ -186,12 +186,8 @@ public final class GeneralUtil {
      * @return The items as comma separated list.
      */
     public static String listText(List<String> items) {
-        if (items == null || items.size() == 0) return null;
-        if (items.size() == 1) return items.get(0);
-        StringBuilder s = new StringBuilder(items.get(0));
-        for (int i = 1; i < items.size(); i++)
-            s.append(", ").append(items.get(i));
-        return s.toString();
+        if (items == null || items.isEmpty()) return null;
+        return String.join(", ", items);
     }
 
 

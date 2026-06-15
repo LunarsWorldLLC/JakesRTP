@@ -1,6 +1,6 @@
 package biz.donvi.jakesRTP;
 
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Utility class for generating random coordinates in various shapes.
@@ -8,27 +8,26 @@ import java.util.Random;
  */
 public final class RandomCords {
 
-    private static final Random random = new Random();
-
     private RandomCords() {}
 
     /**
      * Generates random coordinates within a circle (donut shape with min/max radius).
      */
     public static double[] getRandXyCircle(int radiusMax, int radiusMin, double gaussianShrink, double gaussianCenter) {
-        double angle = random.nextDouble() * 2 * Math.PI;
+        var rand = ThreadLocalRandom.current();
+        double angle = rand.nextDouble() * 2 * Math.PI;
         double radius;
 
         if (gaussianShrink > 0) {
             // Gaussian distribution
-            double gaussian = random.nextGaussian() * gaussianShrink + gaussianCenter;
+            double gaussian = rand.nextGaussian() * gaussianShrink + gaussianCenter;
             gaussian = Math.max(0, Math.min(1, (gaussian + 3) / 6)); // Normalize to 0-1
             radius = radiusMin + gaussian * (radiusMax - radiusMin);
         } else {
             // Uniform distribution within the annulus
             double minSq = (double) radiusMin * radiusMin;
             double maxSq = (double) radiusMax * radiusMax;
-            radius = Math.sqrt(minSq + random.nextDouble() * (maxSq - minSq));
+            radius = Math.sqrt(minSq + rand.nextDouble() * (maxSq - minSq));
         }
 
         return new double[]{
@@ -48,21 +47,22 @@ public final class RandomCords {
      * Generates random coordinates within a square with optional gaussian distribution.
      */
     public static double[] getRandXySquare(int radiusMax, int radiusMin, double gaussianShrink, double gaussianCenter) {
+        var rand = ThreadLocalRandom.current();
         double x, z;
 
         do {
             if (gaussianShrink > 0) {
                 // Gaussian distribution
-                double gx = random.nextGaussian() * gaussianShrink + gaussianCenter;
-                double gz = random.nextGaussian() * gaussianShrink + gaussianCenter;
+                double gx = rand.nextGaussian() * gaussianShrink + gaussianCenter;
+                double gz = rand.nextGaussian() * gaussianShrink + gaussianCenter;
                 gx = Math.max(-1, Math.min(1, gx / 3));
                 gz = Math.max(-1, Math.min(1, gz / 3));
                 x = gx * radiusMax;
                 z = gz * radiusMax;
             } else {
                 // Uniform distribution
-                x = (random.nextDouble() * 2 - 1) * radiusMax;
-                z = (random.nextDouble() * 2 - 1) * radiusMax;
+                x = (rand.nextDouble() * 2 - 1) * radiusMax;
+                z = (rand.nextDouble() * 2 - 1) * radiusMax;
             }
         } while (Math.abs(x) < radiusMin && Math.abs(z) < radiusMin);
 
@@ -73,8 +73,9 @@ public final class RandomCords {
      * Generates random coordinates within a rectangle.
      */
     public static double[] getRandXyRectangle(int xRadius, int zRadius) {
-        double x = (random.nextDouble() * 2 - 1) * xRadius;
-        double z = (random.nextDouble() * 2 - 1) * zRadius;
+        var rand = ThreadLocalRandom.current();
+        double x = (rand.nextDouble() * 2 - 1) * xRadius;
+        double z = (rand.nextDouble() * 2 - 1) * zRadius;
         return new double[]{x, z};
     }
 
@@ -82,11 +83,12 @@ public final class RandomCords {
      * Generates random coordinates within a rectangle with a gap (exclusion zone).
      */
     public static double[] getRandXyRectangle(int xRadius, int zRadius, int gapXRadius, int gapZRadius, int gapXCenter, int gapZCenter) {
+        var rand = ThreadLocalRandom.current();
         double x, z;
 
         do {
-            x = (random.nextDouble() * 2 - 1) * xRadius;
-            z = (random.nextDouble() * 2 - 1) * zRadius;
+            x = (rand.nextDouble() * 2 - 1) * xRadius;
+            z = (rand.nextDouble() * 2 - 1) * zRadius;
         } while (Math.abs(x - gapXCenter) < gapXRadius && Math.abs(z - gapZCenter) < gapZRadius);
 
         return new double[]{x, z};

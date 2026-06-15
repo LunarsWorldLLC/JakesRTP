@@ -32,8 +32,8 @@ public class SafeLocationUtils {
         }
         if (patchClass != null)
             try {
-                patchInstance = patchClass.newInstance();
-            } catch (IllegalAccessException | InstantiationException e) {
+                patchInstance = patchClass.getDeclaredConstructor().newInstance();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         else patchInstance = new SafeLocationUtils_Patch.BlankPatch();

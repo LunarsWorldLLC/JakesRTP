@@ -78,10 +78,11 @@ public abstract class SafeLocationFinder {
 
             moveToStart(checkProfile);
 
-            for (int i = 0, spiralArea = (int) Math.pow(checkRadiusXZ * 2 + 1, 2); i < spiralArea; i++)
+            int side = checkRadiusXZ * 2 + 1;
+            for (int i = 0, spiralArea = side * side; i < spiralArea; i++)
                 if (checkSafety(checkRadiusVert)) {
                     loc.add(0.5, 1, 0.5);
-                    loc.setYaw((float) (360f * Math.random()));
+                    loc.setYaw(java.util.concurrent.ThreadLocalRandom.current().nextFloat() * 360f);
                     return true;
                 } else nextInSpiral();
         } catch (TimeoutException e) {
