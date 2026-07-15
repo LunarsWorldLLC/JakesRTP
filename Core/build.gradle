@@ -18,6 +18,15 @@ repositories {
     maven { url 'https://repo.mikeprimm.com/'}
 }
 
+// paper-api declares the 'spigot-api' and 'bukkit' capabilities, so the old spigot-api / bukkit
+// pulled in transitively by the soft-dependency plugin APIs (dynmap-api, WorldBorder, GriefPrevention,
+// etc.) collide with it under Gradle's capability checks. paper-api already provides every org.bukkit.*
+// class those APIs need, so drop the legacy modules from every configuration.
+configurations.configureEach {
+    exclude group: 'org.spigotmc', module: 'spigot-api'
+    exclude group: 'org.bukkit', module: 'bukkit'
+}
+
 dependencies {
     compileOnly 'io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT'
 //    implementation project(":patch-1-12-2")
