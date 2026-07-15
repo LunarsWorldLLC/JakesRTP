@@ -1,6 +1,5 @@
 package biz.donvi.jakesRTP;
 
-import io.papermc.lib.PaperLib;
 import org.bukkit.*;
 
 import java.util.HashMap;
@@ -82,7 +81,7 @@ public class SafeLocationFinderOtherThread extends SafeLocationFinder {
             // the async method to get the chunk. Now, this would be easy enough, and could be done with this code:
             //         chunkSnapshot = Bukkit.getScheduler().callSyncMethod(
             //             PluginMain.plugin,
-            //             () -> PaperLib.getChunkAtAsync(loc).thenApply(Chunk::getChunkSnapshot)
+            //             () -> loc.getWorld().getChunkAtAsync(loc).thenApply(Chunk::getChunkSnapshot)
             //         ).get(timeout, TimeUnit.SECONDS).get(timeout, TimeUnit.SECONDS));
             // but taking this approach leads to issues shutting down the request as we either need to wait for the
             // the timeout to be reached, or let the server forcefully kill it (and send us an annoying message in
@@ -92,7 +91,7 @@ public class SafeLocationFinderOtherThread extends SafeLocationFinder {
             Future<CompletableFuture<ChunkSnapshot>> callSyncFuture =
                 Bukkit.getScheduler().callSyncMethod(
                     JakesRtpPlugin.plugin,
-                    () -> PaperLib.getChunkAtAsync(chunkAt).thenApply(Chunk::getChunkSnapshot)
+                    () -> chunkAt.getWorld().getChunkAtAsync(chunkAt).thenApply(Chunk::getChunkSnapshot)
                 );
             // Looks to get the result of `callSyncFuture` which will be the value of `getChunkSnapshotFuture`
             while (System.currentTimeMillis() < maxTime && plugin.locCache())

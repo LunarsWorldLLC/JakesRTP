@@ -1,6 +1,5 @@
 package biz.donvi.jakesRTP;
 
-import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -108,7 +107,7 @@ public class RandomTeleportAction {
      */
     public RandomTeleportAction teleportAsync(Player player) throws JrtpBaseException {
         preTeleport(player);
-        PaperLib.teleportAsync(player, landingLoc).thenAccept(this::postTeleport);
+        player.teleportAsync(landingLoc).thenAccept(this::postTeleport);
         return this;
     }
 
@@ -133,8 +132,10 @@ public class RandomTeleportAction {
             try {
                 landingLoc = randomTeleporter.getRtpLocation(rtpProfile, callFromLoc, takeFromQueue);
                 setupPlaceholders();
-                // Now teleport the player (PaperLib handles the sync part)
-                PaperLib.teleportAsync(player, landingLoc).thenAccept(this::postTeleport);
+                // The teleport must be initiated from the main thread; teleportAsync then loads the
+                // destination chunk asynchronously on its own before completing the teleport.
+                Bukkit.getScheduler().runTask(JakesRtpPlugin.plugin, () ->
+                    player.teleportAsync(landingLoc).thenAccept(this::postTeleport));
             } catch (JrtpBaseException e) {
                 // Send error message on main thread
                 Bukkit.getScheduler().runTask(JakesRtpPlugin.plugin, () ->

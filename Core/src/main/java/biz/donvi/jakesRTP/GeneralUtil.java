@@ -1,7 +1,5 @@
 package biz.donvi.jakesRTP;
 
-import io.papermc.lib.PaperLib;
-import org.apache.commons.lang.text.StrBuilder;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -45,7 +43,7 @@ public final class GeneralUtil {
         String[] posS = new String[3];
         String worldName = loc.getWorld() == null ? "" : loc.getWorld().getName();
         DecimalFormat decimalFormat = decimalPlaces == 0 ? new DecimalFormat("0")
-            : new DecimalFormat(new StrBuilder("0.").append(stringOf('#', decimalPlaces)).toString());
+            : new DecimalFormat(new StringBuilder("0.").append(stringOf('#', decimalPlaces)).toString());
         for (int i = 0; i < pos.length; i++) posS[i] = decimalFormat.format(pos[i]);
         return worldName + " (" + posS[0] + ", " + posS[1] + ", " + posS[2] + ")";
     }
@@ -176,7 +174,8 @@ public final class GeneralUtil {
      */
     public static boolean isAnchorSpawn(PlayerRespawnEvent event) {return anchorSupport && event.isAnchorSpawn();}
 
-    private static final boolean anchorSupport = PaperLib.getMinecraftVersion() >= 16;
+    // Respawn anchors have existed since 1.16; every supported server is well past that.
+    private static final boolean anchorSupport = true;
 
     /**
      * Just lists out the items in a list. Doesn't say "and" or "or" at the end, its just a simple

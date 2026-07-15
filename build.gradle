@@ -6,12 +6,14 @@ subprojects {
     group = 'biz.donvi'
     project.version = '0.14.9'
 
-    sourceCompatibility = 16
-    targetCompatibility = 16
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
 
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
-
     }
 
     repositories {
@@ -20,6 +22,6 @@ subprojects {
     }
 
     tasks.withType(Copy).all {
-        duplicatesStrategy 'include'
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
     }
 }
