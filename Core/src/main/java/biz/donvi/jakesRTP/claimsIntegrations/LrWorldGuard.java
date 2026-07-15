@@ -73,16 +73,33 @@ public class LrWorldGuard implements LocationRestrictor {
 
     @Override
     public boolean denyLandingAtLocation(Location location) {
+        // If our flag never registered (WorldGuard absent during onLoad, its flag registry already
+        // locked, or the plugin was hot-loaded after startup), we can't query it. Try a lazy lookup,
+        // and if it's still unavailable don't restrict — passing a null flag to WorldGuard NPEs, and
+        // the flag defaults to allowing RTP landings anyway.
+        StateFlag flag = customJrtpFlag;
+        if (flag == null) flag = customJrtpFlag = lookupExistingFlag();
+        if (flag == null) return false;
         // Get a set of all regions at the location
         ApplicableRegionSet set = getRegionManager(location.getWorld()).getApplicableRegions(
             BlockVector3.at(location.getX(), location.getY(), location.getZ())
         );
-        // And test if our flg is allowed.
-        boolean flagStatus = set.testState(null, customJrtpFlag);
+        // And test if our flag is allowed.
+        boolean flagStatus = set.testState(null, flag);
         return !flagStatus;
     }
 
     private static StateFlag customJrtpFlag = null;
+
+    /** Fetches the already-registered JRTP landing flag from WorldGuard, or null if it isn't present. */
+    private static StateFlag lookupExistingFlag() {
+        try {
+            Flag<?> existing = WorldGuard.getInstance().getFlagRegistry().get("allow-jrtp-landing");
+            return existing instanceof StateFlag ? (StateFlag) existing : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
     public static void registerWorldGuardFlag(Plugin plugin) {
         // ONLY RUN THIS IF WorldGuard DOES IN FACT EXIST
@@ -97,7 +114,10 @@ public class LrWorldGuard implements LocationRestrictor {
             registry.register(flag);
             customJrtpFlag = flag; // only set our field if there was no error
             logger.log(Level.INFO, "Added custom flag to world guard.");
-        } catch (FlagConflictException e) {
+        } catch (FlagConflictException | IllegalStateException e) {
+            // FlagConflictException: the flag already exists. IllegalStateException: the registry is
+            // already locked (e.g. we were loaded after WorldGuard finished startup). In both cases,
+            // reuse the existing flag if one is present.
             Flag<?> existing = registry.get("allow-jrtp-landing");
             if (existing instanceof StateFlag) {
                 customJrtpFlag = (StateFlag) existing;
