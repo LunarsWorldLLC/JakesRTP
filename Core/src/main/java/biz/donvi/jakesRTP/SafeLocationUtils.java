@@ -84,6 +84,9 @@ public class SafeLocationUtils {
             case BIG_DRIPLEAF:
             case BIG_DRIPLEAF_STEM:
             case POINTED_DRIPSTONE:
+            case BARRIER:
+            case LIGHT:
+            case STRUCTURE_VOID:
                 return false;
             case GRASS_BLOCK:
             case STONE:
@@ -127,9 +130,16 @@ public class SafeLocationUtils {
      * @return Whether it is safe to go through
      */
     boolean isSafeToGoThrough(Material mat) {
-        //At the time of writing this, I can not think of any materials other than leaves that fit this category.
-        //I am leaving the method in place though so if I decide to add more materials later, it will be easy.
-        return isTreeLeaves(mat);
+        // Invisible map-building blocks: barrier roofs and the tops of barrier walls sit in the air
+        // above the real ground, so the search drops through them instead of landing players on top.
+        switch (mat) {
+            case BARRIER:
+            case LIGHT:
+            case STRUCTURE_VOID:
+                return true;
+            default:
+                return isTreeLeaves(mat);
+        }
     }
 
     /* ================================================== *\
